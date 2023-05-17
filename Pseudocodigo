@@ -1,0 +1,267 @@
+algoritmo
+
+funcao inss(salarioBruto: real) : real
+  var taxaFinal: real
+
+  se salarioBruto <= 1302.00 entao
+    taxaFinal <- salarioBruto * 0.075
+  senao se salarioBruto >= 1302.01 e salarioBruto <= 2571.29 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (salarioBruto - 1302.01) * 0.09
+    taxaFinal <- taxa1 + taxa2
+  senao se salarioBruto >= 2571.30 e salarioBruto <= 3856.94 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (2571.29 - 1302.01) * 0.09
+    taxa3 <- (salarioBruto - 2571.30) * 0.12
+    taxaFinal <- taxa1 + taxa2 + taxa3
+  senao se salarioBruto >= 3865.95 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (2571.29 - 1302.01) * 0.09
+    taxa3 <- (3856.94 - 2571.30) * 0.12
+    taxa4 <- (salarioBruto - 3856.94) * 0.14
+    taxaFinal <- taxa1 + taxa2 + taxa3 + taxa4
+  fim se
+
+  retorne taxaFinal
+fim funcao
+
+funcao irrf(salario: real) : real
+  var imposto: real
+
+  se salario <= 1903.98 entao
+    imposto <- 0.0
+  senao se salario > 1903.98 e salario <= 2826.65 entao
+    imposto <- (0.075 * salario) - 142.80
+  senao se salario > 2826.65 e salario <= 3751.05 entao
+    imposto <- (0.15 * salario) - 354.80
+  senao se salario > 3751.05 e salario <= 4664.68 entao
+    imposto <- (0.225 * salario) - 636.13
+  senao se salario > 4664.68 entao
+    imposto <- (0.275 * salario) - 869.36
+  fim se
+
+  retorne imposto
+fim funcao
+
+funcao calcVt(salario: real) : real
+  var calc: real
+
+  calc <- salario * 0.06
+
+  retorne calc
+fim funcao
+
+funcao faltas(salario: real, faltas: inteiro) : real
+  var calc, calc2: real
+
+  calc <- salario / 30
+  calc2 <- calc * faltas
+
+  retorne calc2
+fim funcao
+
+funcao horasExtras(salario: real, horas: real) : real
+  var calc, calc2: real
+
+  calc <- (salario / 30) / 8
+  calc2 <- calc * horas
+
+  retorne calc2
+fim funcao
+
+funcao calcFgts(periodo: real, salario: real) : real
+  var calc, calc2: real
+
+  calc <- salario * 0.08
+  calc2 <- calc * periodo
+
+  retorne calc2
+fim funcao
+
+funcao main()
+  var s, faltasfp, hefp, adiantfp, v, x, basecalculo, x2, calcfaltas, calcHe, salarioLiq: real
+  var motivo: cadeia
+
+  escreva("Olá Colaborador!")
+  escreva("Informe seu salário bruto mensal em R$")
+  leia(s)
+  escreva("Informe o numero de faltas")
+  leia(faltasfp)
+  escreva("Informe as horas extras (se houver)")
+  leia(hefp)
+  escreva("Informe o adiantamento (se houver)")
+  leia(adiantfp)
+
+  v <- calcVt(s)
+  x <- inss(s)
+  basecalculo <- s - x
+  x2 <- irrf(basecalculo)
+  calcfaltas <- faltas(s, faltasfp)
+  calcHe <- horasExtras(s, hefp)
+  salarioLiq <- (s + calcHe) - calcfaltas - x2 - v - x - adiantfp
+
+  escreva("A contribuição do seu colaborador ao INSS será de: R$", x)
+  escreva("O cálculo do valor do Imposto de renda retido na fonte sobre o salário do trabalhador será de: R$", x2)
+  escreva("O vale transporte será de: R$", v)
+  escreva("O desconto por faltas será de: R$", calcfaltas)
+  escreva("O acréscimo por horas extras será de: R$", calcHe)
+  escreva("O salário líquido do colaborador será de: R$", salarioLiq)
+
+  escreva("Informe o salário de rescisão")
+  leia(s)
+  escreva("Informe o tempo de serviço de rescisão")
+  leia(tempoServ)
+  escreva("Informe o mês de saída")
+  leia(mesSaida)
+
+  escreva("Informe o motivo de desligamento")
+  leia(motivo)
+
+  se motivo = "Pedido de demissão" entao
+    se feriasvencsim = verdadeiro e avisoprevsim = verdadeiro entao
+
+    senao se feriasvencnao = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencsim = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencnao = verdadeiro e avisoprevsim = verdadeiro entao
+
+    fim se
+
+  senao se motivo = "Dispensa sem justa causa" entao
+    se feriasvencsim = verdadeiro e avisoprevsim = verdadeiro entao
+      saldoSalario <- s
+      d13 <- (s / 12) * mesSaida
+      feriasVenc <- s
+      feriasPro <- (s / 12) * mesSaida
+      tercoFeriasPro <- feriasPro / 3
+      tercoFeriasVenc <- feriasVenc / 3
+      descInss <- inss(s)
+      descIrrf <- irrf(s)
+      descInss13 <- inss(d13)
+      descIrrf13 <- irrf(d13)
+      calcRescisao <- saldoSalario + d13 + feriasPro + feriasVenc + tercoFeriasPro + tercoFeriasVenc - descInss - descIrrf - descInss13 - descIrrf13
+      escreva("O valor da rescisão é: R$", arredonda(calcRescisao, 2))
+
+    senao se feriasvencnao = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencsim = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencnao = verdadeiro e avisoprevsim = verdadeiro entao
+
+    fim se
+
+  senao se motivo = "Dispensa com justa causa" entao
+    se feriasvencsim = verdadeiro e avisoprevsim = verdadeiro entao
+
+    senao se feriasvencnao = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencsim = verdadeiro e avisoprevnao = verdadeiro entao
+
+    senao se feriasvencnao = verdadeiro e avisoprevsim = verdadeiro entao
+
+    fim se
+
+    var p1, s1, p2, s2, p3, s3, calc1, calc2, calc3, calcTotal: real
+
+    escreva("Informe o período 1 do FGTS")
+    leia(p1)
+    escreva("Informe o salário 1 do FGTS")
+    leia(s1)
+    calc1 <- calcFgts(p1, s1)
+
+    escreva("Informe o período 2 do FGTS")
+    leia(p2)
+    escreva("Informe o salário 2 do FGTS")
+    leia(s2)
+    calc2 <- calcFgts(p2, s2)
+
+    escreva("Informe o período 3 do FGTS")
+    leia(p3)
+    escreva("Informe o salário 3 do FGTS")
+    leia(s3)
+    calc3 <- calcFgts(p3, s3)
+
+    calcTotal <- calc1 + calc2 + calc3
+
+    escreva("O valor total do FGTS é: ", arredonda(calcTotal, 2))
+
+fim funcao
+
+funcao inss(salarioBruto: real) -> real
+  var taxaFinal: real
+
+  se salarioBruto <= 1302.00 entao
+    taxaFinal <- salarioBruto * 0.075
+  senao se salarioBruto >= 1302.01 e salarioBruto <= 2571.29 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (salarioBruto - 1302.01) * 0.09
+    taxaFinal <- taxa1 + taxa2
+  senao se salarioBruto >= 2571.30 e salarioBruto <= 3856.94 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (2571.29 - 1302.01) * 0.09
+    taxa3 <- (salarioBruto - 2571.30) * 0.12
+    taxaFinal <- taxa1 + taxa2 + taxa3
+  senao se salarioBruto >= 3865.95 entao
+    taxa1 <- 1302.00 * 0.075
+    taxa2 <- (2571.29 - 1302.01) * 0.09
+    taxa3 <- (3856.94 - 2571.30) * 0.12
+    taxa4 <- (salarioBruto - 3856.94) * 0.14
+    taxaFinal <- taxa1 + taxa2 + taxa3 + taxa4
+  fim se
+
+  retorne taxaFinal
+fim funcao
+
+funcao irrf(salario: real) -> real
+  var imposto: real
+
+  se salario <= 1903.98 entao
+    imposto <- 0.0
+  senao se salario > 1903.98 e salario <= 2826.65 entao
+    imposto <- (0.075 * salario) - 142.80
+  senao se salario > 2826.65 e salario <= 3751.05 entao
+    imposto <- (0.15 * salario) - 354.80
+  senao se salario > 3751.05 e salario <= 4664.68 entao
+    imposto <- (0.225 * salario) - 636.13
+  senao se salario > 4664.68 entao
+    imposto <- (0.275 * salario) - 869.36
+  fim se
+
+  retorne imposto
+fim funcao
+
+funcao calcVt(salario: real) -> real
+  var calc: real
+
+  calc <- salario * 0.06
+
+  retorne calc
+fim funcao
+
+funcao faltas(salario: real, faltas: inteiro) -> real
+  var calc, calc2: real
+
+  calc <- salario / 30
+  calc2 <- calc * faltas
+
+  retorne calc2
+fim funcao
+
+funcao horasExtras(salario: real, horas: real) -> real
+  var calc, calc2: real
+
+  calc <- (salario / 30) / 8
+  calc2 <- calc * horas
+
+  retorne calc2
+fim funcao
+
+funcao calcFgts(periodo: real, salario: real) -> real
+  var calc, calc2: real
+
+  calc <- salario * 0.08
+  calc2 <- calc * periodo
+
+  retorne calc2
+fim funcao
